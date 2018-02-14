@@ -19,4 +19,7 @@ $(()=>{
     $('#trainerDetails').click(()=>{
         window.location='../trainerdetails.html';
     })
+    $('#chat').click(()=>{
+        window.location='../chat.html';
+    })
 });

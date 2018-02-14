@@ -6,6 +6,9 @@ const path = require("path");
 const models = require("../models/mongodb/mongo");
 const auth = require("../models/sql/sequelize").auth;
 
+route.get('/',(req,res)=>{
+    res.sendFile(path.join(__dirname,"../public_html/customerDash.html"));
+});
 route.get('/availableTrainer',(req,res)=>{
     res.sendFile(path.join(__dirname,"../public_html/availableTrainer.html"));
 });

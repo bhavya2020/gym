@@ -220,15 +220,13 @@ module.exports = function (app) {
     app.get("/login", (req, res) => {
         if (req.user) {
             if(req.user.isTrainer)
-                res.redirect("/trainer");
+                res.redirect("/trainers");
             else
                 res.redirect("/customer");
 
         }
         else
-            res.send( {
-                message: req.flash("loginMsg")
-            });
+            res.sendFile(path.join(__dirname,"../public_html/login.html"));
     });
 
 //Login Route
@@ -243,15 +241,13 @@ module.exports = function (app) {
         if (req.user)
         {
             if(req.user.isTrainer)
-                res.redirect("/trainer");
+                res.redirect("/trainers");
             else
                 res.redirect("/customer");
 
         }
         else
-            res.send({
-                message: req.flash("loginMsg")
-            });
+            res.sendFile(path.join(__dirname,"../public_html/signup.html"));
     });
 
 //New User via SignUp route
