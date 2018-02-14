@@ -7,7 +7,7 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const MongoStore = require('connect-mongo')(session);
 const flash = require("connect-flash");
-
+const HELPERS=require('./helpers');
 /*
     Import User Files
  */
@@ -37,7 +37,7 @@ const store = new MongoStore({mongooseConnection: connection});
 let sessionMiddleware = session({
     resave: true,
     saveUninitialized: false,
-    secret: "saveMoney",
+    secret: "stayFit",
     store: store,
     //if maxAge not set, cookie valid for current session only(until browser restart)
     cookie: {
@@ -63,9 +63,10 @@ app.use((req, res, next) => {
     res.locals.user = req.user;
     next();
 });
+app.use("/customer", HELPERS.checkLoggedIn ,require("./routes/customer"));
+app.use("/trainers",HELPERS.checkLoggedIn , require("./routes/trainers"));
 
 
-// app.use('/users', HELPERS.checkLoggedIn, require("./routes/users"));
 require("./routes/auth")(app);
 
 /*

@@ -1,6 +1,9 @@
 module.exports = (database, DataTypes) => {
     return database.define("auth", {
-        id:DataTypes.STRING,
+        id: {
+            type: DataTypes.STRING,
+            primaryKey: true
+        },
         username: DataTypes.STRING,
         password: DataTypes.STRING,
         isTrainer:DataTypes.BOOLEAN,

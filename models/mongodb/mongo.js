@@ -12,7 +12,7 @@ mongoose.Promise = global.Promise;
 
 //Connect to DB
 mongoose.connect(`mongodb://${CONFIG.MONGO.HOST}:${CONFIG.MONGO.PORT}/${CONFIG.MONGO.DB_NAME}`, {
-    useMongoClient: true
+
 })
     .then(() => {
         console.log("Successful connection to MongoDB");

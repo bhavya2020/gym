@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
 const customerSchema = mongoose.Schema({
-    img: String,
+
+    trainerID:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "trainer"
+    },
     name: String,
     gender: String,
     email:String,

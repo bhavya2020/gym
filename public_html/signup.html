@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form class="ui form" enctype="multipart/form-data" action="/signup/true" method="post">
+
+    <input type="file" name="imgUploader">
+    <input name="name" placeholder="Full Name" type="text" required>
+    <input name="email" placeholder="E-Mail" type="email">
+    <input name="phone" placeholder="Phone Number" type="text" required>
+    <input name="username" placeholder="Username"  type="text" required>
+    <input name="password" placeholder="password" type="password" required>
+    <button type="submit">Submit</button>
+
+</form>
+<form class="ui form" enctype="multipart/form-data" action="/signup/false" method="post">
+
+    <input type="file" name="imgUploader">
+    <input name="name" placeholder="Full Name" type="text" required>
+    <input name="email" placeholder="E-Mail" type="email">
+    <input name="phone" placeholder="Phone Number" type="text" required>
+    <input name="age" placeholder="age" type="number" required>
+    <input name="gender" placeholder="gender" type="text" required>
+    <input name="address" placeholder="address" type="text" required>
+    <input name="username" placeholder="Username"  type="text" required>
+    <input name="password" placeholder="password" type="password" required>
+    <button type="submit">Submit</button>
+
+</form>
+</body>
+</html>

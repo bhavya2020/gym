@@ -5,7 +5,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require('bcryptjs');
 
 //Import Auth Model'
-const Users = require("./models/sql/sequelize.js").auth;
+const auth = require("./models/sql/sequelize.js").auth;
 
 //Import MongoDB models
 const models = require("./models/mongodb/mongo");
@@ -16,7 +16,7 @@ passport.serializeUser(function (user, done) {
 
 //De-Serialize User
 passport.deserializeUser(function (id, done) {
-    Users.findById(id)
+    auth.findById(id)
         .then((user) => {
             done(null, user);
         })
@@ -45,30 +45,30 @@ const localstrategy = new LocalStrategy(
                         // res === true
                         if (res) {
 
-                            if(userAuth.isTrainer)
-                            {
-                                models.trainer.findById(userAuth.id)
-                                    .then((trainer)=>{
-
-                                        return done(null, trainer);
-                                    })
-                                    .catch((err)=>{
-                                    console.log(err);
-                                    })
-
-                            }
-                            else
-                            {
-                                models.customer.findById(userAuth.id)
-                                    .then((customer)=>{
-
-                                        return done(null, customer);
-                                    })
-                                    .catch((err)=>{
-                                        console.log(err);
-                                    })
-                            }
-                            return done(null, user);
+                            // if(userAuth.isTrainer)
+                            // {
+                            //     models.trainer.findById(userAuth.id)
+                            //         .then((trainer)=>{
+                            //
+                            //             return done(null, trainer);
+                            //         })
+                            //         .catch((err)=>{
+                            //         console.log(err);
+                            //         })
+                            //
+                            // }
+                            // else
+                            // {
+                            //     models.customer.findById(userAuth.id)
+                            //         .then((customer)=>{
+                            //
+                            //             return done(null, customer);
+                            //         })
+                            //         .catch((err)=>{
+                            //             console.log(err);
+                            //         })
+                            // }
+                            return done(null, userAuth);
                         }
                         else {
                             return done(null, false, req.flash("loginMsg","Password incorrect !"));

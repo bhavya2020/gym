@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const trainerSchema = mongoose.Schema({
 
-    img: String,
     name: String,
     email:String,
     phoneNo: String,

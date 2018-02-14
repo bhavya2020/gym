@@ -1,13 +1,14 @@
 const Passport = require("../passport");
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
-const Users = require("../models/sql/sequelize").Users;
+const nodemailer=require('nodemailer');
+const auth = require("../models/sql/sequelize").auth;
 const Sequelize = require('sequelize');
 const CONFIG = require("../configs");
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const models=require('../models/mongodb/mongo');
 
 
 module.exports = function (app) {
@@ -19,11 +20,6 @@ module.exports = function (app) {
         }
     });
     let upload = multer({storage: Storage});
-    // cloudinary.config({
-    //     cloud_name: 'auctioneeer',
-    //     api_key: '553296924422138',
-    //     api_secret: 'YNGylxUU6jLGb9Ioc2P44b07gfQ'
-    // });
 
     /*
     functions
@@ -222,8 +218,13 @@ module.exports = function (app) {
 
 //Render Login Page
     app.get("/login", (req, res) => {
-        if (req.user)
-            res.redirect("/users");
+        if (req.user) {
+            if(req.user.isTrainer)
+                res.redirect("/trainer");
+            else
+                res.redirect("/customer");
+
+        }
         else
             res.send( {
                 message: req.flash("loginMsg")
@@ -232,7 +233,7 @@ module.exports = function (app) {
 
 //Login Route
     app.post("/login", Passport.authenticate('local', {
-        successRedirect: "/users",
+        successRedirect: "/login",
         failureRedirect: "/login",
         failureFlash: true
     }));
@@ -240,7 +241,13 @@ module.exports = function (app) {
 //Render SignUp page
     app.get("/signup", (req, res) => {
         if (req.user)
-            res.redirect("/users");
+        {
+            if(req.user.isTrainer)
+                res.redirect("/trainer");
+            else
+                res.redirect("/customer");
+
+        }
         else
             res.send({
                 message: req.flash("loginMsg")
@@ -248,79 +255,104 @@ module.exports = function (app) {
     });
 
 //New User via SignUp route
-    app.post("/signup", upload.single('imgUploader'), function (req, res) {
+    app.post("/signup/:isTrainer", upload.single('imgUploader'), function (req, res) {
 
-        Users.find({
+    auth.find({
             where: {
-                [Sequelize.Op.or]: [
-                    {username: req.body.username},
-                    {email: req.body.email}
-                ]
-            }
+                    username: req.body.username,
+                }
         })
             .then((user) => {
                 if (!user) {
-                    bcrypt.genSalt(10, function (err, salt) {
-                        bcrypt.hash(req.body.password, salt, function (err, hash) {
-                            // Store hash in your password DB.
-                            Users.create({
-                                username: req.body.username,
-                                password: hash,
-                                name: req.body.name,
-                                email: req.body.email,
-                                phone1: req.body.phone1,
-                                phone2: req.body.phone2,
-                            })
-                                .then((user) => {
-                                    let imgName;
-                                    if (req.file) {
-                                        imgName = req.file.filename;
-                                        fs.rename(path.join(__dirname, "../", "public_html/Images/", imgName), path.join(__dirname, "../", "public_html/Images/", user.id + ".jpg"), (err) => {
+
+
+                    if (req.params.isTrainer === "true") {
+                        models.trainer.create({
+                            name: req.body.name,
+                            email: req.body.email,
+                            phoneNo: req.body.phone,
+
+                        }).then((trainer) => {
+                            bcrypt.genSalt(10, function (err, salt) {
+                                bcrypt.hash(req.body.password, salt, function (err, hash) {
+
+                                    // Store hash in your password DB.
+                                     auth.create({
+                                        id: trainer._id.toString(),
+                                        username: req.body.username,
+                                        password: hash,
+                                        isTrainer: true
+
+                                    }).then((userAuth) => {
+                                        fs.rename(path.join(__dirname, "../", "public_html/Images/", req.file.filename), path.join(__dirname, "../", "public_html/Images/", userAuth.id + ".jpg"), (err) => {
+                                            if (err) {
+                                                console.log(err);
+                                            }
+                                        });
+                                        req.login(userAuth, (err) => {
                                             if (err) {
                                                 console.log(err);
                                             }
                                             else {
-                                                //Store image url in DB
-                                                user.img = "/Images/" + user.id;
-                                                user.save()
-                                                    .then(() => {
-                                                        req.login(user, (err) => {
-                                                            if (err) {
-                                                                console.log(err);
-                                                            }
-                                                            else {
-                                                                res.redirect('/login');
-                                                            }
-                                                        });
-                                                    })
-                                                    .catch((err) => {
-                                                        console.log(err);
-                                                    })
+                                                res.redirect('/login');
                                             }
-                                        })
-                                    }
-                                    else {
-                                        user.img = "/images/user.png";
-                                        user.save()
-                                            .then(() => {
-                                                req.login(user, (err) => {
-                                                    if (err) {
-                                                        console.log(err);
-                                                    }
-                                                    else {
-                                                        res.redirect('/login');
-                                                    }
-                                                });
-                                            })
-                                            .catch((err) => {
-                                                console.log(err);
-                                            })
-                                    }
-                                }).catch((err) => {
-                                console.log(err);
+                                        });
+                                    }).catch((err)=>{
+                                        console.log(err);
+                                    })
+                                })
                             })
+
+
                         })
-                    })
+
+                    }
+                    else {
+                        models.customer.create({
+                            name: req.body.name,
+                            email: req.body.email,
+                            phoneNo: req.body.phone,
+                            age: req.body.age,
+                            gender: req.body.gender,
+                            address: req.body.address
+
+                        }).then((customer) => {
+
+                            bcrypt.genSalt(10, function (err, salt) {
+                                bcrypt.hash(req.body.password, salt, function (err, hash) {
+
+                                    // Store hash in your password DB.
+                                     auth.create({
+                                        id: customer._id.toString(),
+                                        username: req.body.username,
+                                        password: hash,
+                                        isTrainer: false
+
+                                    }).then((userAuth) => {
+                                         fs.rename(path.join(__dirname, "../", "public_html/Images/", req.file.filename), path.join(__dirname, "../", "public_html/Images/", userAuth.id + ".jpg"), (err) => {
+                                             if (err) {
+                                                 console.log(err);
+                                             }
+                                         });
+                                         req.login(userAuth, (err) => {
+                                             if (err) {
+                                                 console.log(err);
+                                             }
+                                             else {
+                                                 res.redirect('/customer/availableTrainer');
+                                             }
+                                         });
+                                     }).catch((err)=>{
+                                         console.log(err);
+                                     })
+                                })
+                            })
+
+
+                        })
+                    }
+
+
                 }
                 else {
                     res.send("Username already taken");
