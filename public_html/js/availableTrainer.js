@@ -15,8 +15,8 @@ $(()=>{
 
         $.post('/customer/chooseTrainer',{
           id:$('input[name="trainers"]:checked')[0].parentNode.id
-        },()=>{
-
+        },(data)=>{
+            window.location='../customerDash.html';
         })
     })
 });

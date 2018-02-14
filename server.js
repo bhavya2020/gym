@@ -64,7 +64,7 @@ app.use((req, res, next) => {
     next();
 });
 app.use("/customer", HELPERS.checkLoggedIn ,require("./routes/customer"));
-app.use("/trainers",HELPERS.checkLoggedIn , require("./routes/trainers"));
+app.use("/trainers", HELPERS.checkLoggedIn , require("./routes/trainers"));
 
 
 require("./routes/auth")(app);

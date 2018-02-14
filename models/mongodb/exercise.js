@@ -12,17 +12,9 @@ const exerciseSchema = mongoose.Schema({
     },
     exercises: [{
 
-
         exerciseName:String,
         exerciseDescription:String,
-        currDate: {
-            type: Date,
-            default: Date.now
-        },
-        expiryDate: {
-            type: Date,
-            default: Date.now+15*3600*24
-        }
+        expiryDate:Number
 
     }]
 });
